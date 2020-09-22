@@ -25,9 +25,24 @@ def add_matrices():
         print('ERROR')
 
 
+def multiply_by_constant():
+    dimensions = [int(x) for x in input().split()]
+    matrix = get_matrix(dimensions[0], dimensions[1])
+
+    constant = int(input())
+    matrix_result = []
+
+    for i in range(dimensions[0]):
+        matrix_result.append([])
+        for j in range(dimensions[1]):
+            matrix_result[i].append(matrix[i][j] * constant)
+    print_matrix(matrix_result)
+
+
 def print_matrix(matrix):
     for row in matrix:
         print(*row)
 
 
-add_matrices()
+# add_matrices()
+multiply_by_constant()
