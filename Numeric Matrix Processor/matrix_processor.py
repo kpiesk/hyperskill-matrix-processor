@@ -1,4 +1,5 @@
-error = 'The operation cannot be performed'
+operation_error = 'The operation cannot be performed.'
+input_error = 'Incorrect input.'
 
 
 def matrix_processor():
@@ -12,35 +13,42 @@ def user_menu():
                            '3. Multiply matrices\n'
                            '4. Transpose matrix\n'
                            '5. Calculate a determinant\n'
+                           '6. Inverse matrix\n'
                            '0. Exit\n'
                            'Your choice: '))
         if action == 1:
-            add_matrices(get_matrix(1), get_matrix(2))
+            print_matrix(add_matrices(get_matrix(1), get_matrix(2)))
         elif action == 2:
-            multiply_by_constant(get_matrix())
+            print_matrix(multiply_by_constant(
+                get_matrix(), check_type(input('Enter constant: '))))
         elif action == 3:
-            multiply_matrices(get_matrix(1), get_matrix(2))
+            print_matrix(multiply_matrices(get_matrix(1), get_matrix(2)))
         elif action == 4:
             transpose_matrix()
         elif action == 5:
             print(f'The result is:\n{calc_determinant(get_matrix())}\n')
+        elif action == 6:
+            print_matrix(inverse_matrix(get_matrix()))
         elif action == 0:
             exit()
+        else:
+            print(input_error)
 
 
-def get_matrix(number=None):
-    if number == 1:
-        input_text_size = 'Enter size of first matrix: '
-        input_text_matrix = 'Enter first matrix:'
-    elif number == 2:
-        input_text_size = 'Enter size of second matrix: '
-        input_text_matrix = 'Enter second matrix:'
+# gets the matrix from the user
+def get_matrix(matrix_number=None):
+    if matrix_number == 1:
+        size_input_text = 'Enter size of first matrix: '
+        matrix_input_text = 'Enter first matrix:'
+    elif matrix_number == 2:
+        size_input_text = 'Enter size of second matrix: '
+        matrix_input_text = 'Enter second matrix:'
     else:
-        input_text_size = 'Enter size of matrix: '
-        input_text_matrix = 'Enter matrix:'
+        size_input_text = 'Enter size of matrix: '
+        matrix_input_text = 'Enter matrix:'
 
-    rows, columns = [int(x) for x in input(input_text_size).split()]
-    print(input_text_matrix)
+    rows, columns = [int(x) for x in input(size_input_text).split()]
+    print(matrix_input_text)
     matrix = []
     for i in range(rows):
         row = input().split()
@@ -50,11 +58,10 @@ def get_matrix(number=None):
     return matrix
 
 
+# performs matrices addition
 def add_matrices(matrix_1, matrix_2):
-    rows_1 = len(matrix_1)
-    cols_1 = len(matrix_1[0])
-    rows_2 = len(matrix_2)
-    cols_2 = len(matrix_2[0])
+    rows_1, cols_1 = [x for x in get_matrix_size(matrix_1)]
+    rows_2, cols_2 = [x for x in get_matrix_size(matrix_2)]
 
     if rows_1 == rows_2 & cols_1 == cols_2:
         matrices_sum = []
@@ -62,30 +69,27 @@ def add_matrices(matrix_1, matrix_2):
             matrices_sum.append([])
             for j in range(cols_1):
                 matrices_sum[i].append(matrix_1[i][j] + matrix_2[i][j])
-        print_matrix(matrices_sum)
+        return matrices_sum
     else:
-        print(error)
+        print(operation_error)
 
 
-def multiply_by_constant(matrix):
-    matrix_result = []
-    rows = len(matrix)
-    cols = len(matrix[0])
-
-    constant = check_type(input('Enter constant: '))
+# performs matrix multiplication by a scalar
+def multiply_by_constant(matrix, constant):
+    matrix_product = []
+    rows, cols = [x for x in get_matrix_size(matrix)]
 
     for i in range(rows):
-        matrix_result.append([])
+        matrix_product.append([])
         for j in range(cols):
-            matrix_result[i].append(matrix[i][j] * constant)
-    print_matrix(matrix_result)
+            matrix_product[i].append(matrix[i][j] * constant)
+    return matrix_product
 
 
+# performs matrices multiplication
 def multiply_matrices(matrix_1, matrix_2):
-    rows_1 = len(matrix_1)
-    cols_1 = len(matrix_1[0])
-    rows_2 = len(matrix_2)
-    cols_2 = len(matrix_2[0])
+    rows_1, cols_1 = [x for x in get_matrix_size(matrix_1)]
+    rows_2, cols_2 = [x for x in get_matrix_size(matrix_2)]
 
     if cols_1 == rows_2:
         matrices_product = []
@@ -96,11 +100,12 @@ def multiply_matrices(matrix_1, matrix_2):
                 for k in range(rows_2):
                     dot_product += matrix_1[i][k] * matrix_2[k][j]
                 matrices_product[i].append(dot_product)
-        print_matrix(matrices_product)
+        return matrices_product
     else:
-        print(error)
+        print(operation_error)
 
 
+# performs user specified matrix transposition
 def transpose_matrix():
     trans_action = int(input('1. Main diagonal\n'
                              '2. Side diagonal\n'
@@ -110,23 +115,24 @@ def transpose_matrix():
 
     if 1 <= trans_action <= 4:
         if trans_action == 1:
-            transpose_main(get_matrix())
+            print_matrix(transpose_main(get_matrix()))
         elif trans_action == 2:
-            transpose_side(get_matrix())
+            print_matrix(transpose_side(get_matrix()))
         elif trans_action == 3:
-            transpose_vertical(get_matrix())
+            print_matrix(transpose_vertical(get_matrix()))
         elif trans_action == 4:
-            transpose_horizontal(get_matrix())
+            print_matrix(transpose_horizontal(get_matrix()))
+    else:
+        print(input_error)
 
 
 # calculates the determinant of a matrix
 def calc_determinant(matrix):
-    rows = len(matrix)
-    cols = len(matrix[0])
+    rows, cols = [x for x in get_matrix_size(matrix)]
     det = 0
 
     if rows != cols:  # determinant is defined only for square matrices
-        print(error)
+        print(operation_error)
     else:
         if rows == 1:
             det = matrix[0][0]
@@ -138,16 +144,32 @@ def calc_determinant(matrix):
         return det
 
 
+# inverses the matrix
+def inverse_matrix(matrix):
+    if calc_determinant(matrix) == 0:
+        print("This matrix doesn't have an inverse.\n")
+    else:
+        rows, cols = [x for x in get_matrix_size(matrix)]
+        trans_matrix = transpose_main(matrix)
+        cofactors_matrix = []
+        for i in range(rows):
+            cofactors_matrix.append([])
+            for j in range(cols):
+                cofactors_matrix[i].append(calc_cofactor(trans_matrix, i, j))
+
+        return multiply_by_constant(
+            cofactors_matrix, 1 / calc_determinant(matrix))
+
+
 # calculates the cofactor of the given row and column
 def calc_cofactor(matrix, row, col):
     return pow((-1), row + 1 + col + 1) * calc_determinant(get_minor(matrix, row, col))
 
 
-# getting a submatrix by deleting the corresponding rows and columns from the original matrix
+# obtains a submatrix by deleting the corresponding rows and columns
 def get_minor(matrix, delete_row, delete_col):
+    rows, cols = [x for x in get_matrix_size(matrix)]
     minor_matrix = []
-    rows = len(matrix)
-    cols = len(matrix[0])
 
     for i in range(rows):
         minor_matrix.append([])
@@ -155,26 +177,26 @@ def get_minor(matrix, delete_row, delete_col):
             if i != delete_row and j != delete_col:
                 minor_matrix[i].append(matrix[i][j])
 
-    return [row for row in minor_matrix if row]  # returning a matrix without empty rows
+    # returning a matrix without empty rows
+    return [row for row in minor_matrix if row]
 
 
 # performs transposition along the main diagonal
 def transpose_main(matrix):
-    rows = len(matrix)
-    cols = len(matrix[0])
+    rows, cols = [x for x in get_matrix_size(matrix)]
     trans_matrix = []
 
     for i in range(rows):
         trans_matrix.append([])
         for j in range(cols):
             trans_matrix[i].append(matrix[j][i])
-    print_matrix(trans_matrix)
+
+    return trans_matrix
 
 
 # performs transposition along the side diagonal
 def transpose_side(matrix):
-    rows = len(matrix)
-    cols = len(matrix[0])
+    rows, cols = [x for x in get_matrix_size(matrix)]
     trans_matrix = []
 
     for i in range(rows):
@@ -182,7 +204,7 @@ def transpose_side(matrix):
         for j in range(cols):
             row.insert(0, matrix[j][i])
         trans_matrix.insert(0, row)
-    print_matrix(trans_matrix)
+    return trans_matrix
 
 
 # performs transposition along the vertical line
@@ -192,7 +214,7 @@ def transpose_vertical(matrix):
 
     for i in range(cols):
         trans_matrix.append(matrix[i][::-1])
-    print_matrix(trans_matrix)
+    return trans_matrix
 
 
 # performs transposition along the horizontal line
@@ -202,16 +224,11 @@ def transpose_horizontal(matrix):
 
     for i in range(cols):
         trans_matrix.insert(0, matrix[i])
-    print_matrix(trans_matrix)
+    return trans_matrix
 
 
-def print_matrix(matrix):
-    print('The result is:')
-    for row in matrix:
-        print(*row)
-    print()
-
-
+# checks whether the user entered number is int or float
+# returns the input converted to the corresponding type
 def check_type(number):
     try:
         int(number)
@@ -222,6 +239,18 @@ def check_type(number):
             return float(number)
         except ValueError:
             return None
+
+
+# return matrix size (rows and columns)
+def get_matrix_size(matrix):
+    return [len(matrix), len(matrix[0])]
+
+
+def print_matrix(matrix):
+    print('The result is:')
+    for row in matrix:
+        print(*row)
+    print()
 
 
 matrix_processor()
