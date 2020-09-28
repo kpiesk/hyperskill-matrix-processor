@@ -1,3 +1,6 @@
+error = 'The operation cannot be performed'
+
+
 def matrix_processor():
     user_menu()
 
@@ -8,21 +11,19 @@ def user_menu():
                            '2. Multiply matrix by a constant\n'
                            '3. Multiply matrices\n'
                            '4. Transpose matrix\n'
+                           '5. Calculate a determinant\n'
                            '0. Exit\n'
                            'Your choice: '))
         if action == 1:
-            matrix_1 = get_matrix(1)
-            matrix_2 = get_matrix(2)
-            add_matrices(matrix_1, matrix_2)
+            add_matrices(get_matrix(1), get_matrix(2))
         elif action == 2:
-            matrix = get_matrix()
-            multiply_by_constant(matrix)
+            multiply_by_constant(get_matrix())
         elif action == 3:
-            matrix_1 = get_matrix(1)
-            matrix_2 = get_matrix(2)
-            multiply_matrices(matrix_1, matrix_2)
+            multiply_matrices(get_matrix(1), get_matrix(2))
         elif action == 4:
             transpose_matrix()
+        elif action == 5:
+            print(f'The result is:\n{calc_determinant(get_matrix())}\n')
         elif action == 0:
             exit()
 
@@ -63,7 +64,7 @@ def add_matrices(matrix_1, matrix_2):
                 matrices_sum[i].append(matrix_1[i][j] + matrix_2[i][j])
         print_matrix(matrices_sum)
     else:
-        print('ERROR')
+        print(error)
 
 
 def multiply_by_constant(matrix):
@@ -97,7 +98,7 @@ def multiply_matrices(matrix_1, matrix_2):
                 matrices_product[i].append(dot_product)
         print_matrix(matrices_product)
     else:
-        print('ERROR')
+        print(error)
 
 
 def transpose_matrix():
@@ -108,16 +109,53 @@ def transpose_matrix():
                              'Your choice: '))
 
     if 1 <= trans_action <= 4:
-        matrix = get_matrix()
-
         if trans_action == 1:
-            transpose_main(matrix)
+            transpose_main(get_matrix())
         elif trans_action == 2:
-            transpose_side(matrix)
+            transpose_side(get_matrix())
         elif trans_action == 3:
-            transpose_vertical(matrix)
+            transpose_vertical(get_matrix())
         elif trans_action == 4:
-            transpose_horizontal(matrix)
+            transpose_horizontal(get_matrix())
+
+
+# calculates the determinant of a matrix
+def calc_determinant(matrix):
+    rows = len(matrix)
+    cols = len(matrix[0])
+    det = 0
+
+    if rows != cols:  # determinant is defined only for square matrices
+        print(error)
+    else:
+        if rows == 1:
+            det = matrix[0][0]
+        elif rows == 2:
+            det = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
+        else:
+            for j in range(cols):
+                det += matrix[0][j] * calc_cofactor(matrix, 0, j)
+        return det
+
+
+# calculates the cofactor of the given row and column
+def calc_cofactor(matrix, row, col):
+    return pow((-1), row + 1 + col + 1) * calc_determinant(get_minor(matrix, row, col))
+
+
+# getting a submatrix by deleting the corresponding rows and columns from the original matrix
+def get_minor(matrix, delete_row, delete_col):
+    minor_matrix = []
+    rows = len(matrix)
+    cols = len(matrix[0])
+
+    for i in range(rows):
+        minor_matrix.append([])
+        for j in range(cols):
+            if i != delete_row and j != delete_col:
+                minor_matrix[i].append(matrix[i][j])
+
+    return [row for row in minor_matrix if row]  # returning a matrix without empty rows
 
 
 # performs transposition along the main diagonal
