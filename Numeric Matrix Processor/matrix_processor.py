@@ -3,10 +3,10 @@ input_error = 'Incorrect input.'
 
 
 def matrix_processor():
-    user_menu()
+    ui()
 
 
-def user_menu():
+def ui():
     while True:
         action = int(input('1. Add matrices\n'
                            '2. Multiply matrix by a constant\n'
@@ -35,7 +35,7 @@ def user_menu():
             print(input_error)
 
 
-# gets the matrix from the user
+# Gets the matrix from the user
 def get_matrix(matrix_number=None):
     if matrix_number == 1:
         size_input_text = 'Enter size of first matrix: '
@@ -58,11 +58,12 @@ def get_matrix(matrix_number=None):
     return matrix
 
 
-# performs matrices addition
+# Performs matrices addition
 def add_matrices(matrix_1, matrix_2):
     rows_1, cols_1 = [x for x in get_matrix_size(matrix_1)]
     rows_2, cols_2 = [x for x in get_matrix_size(matrix_2)]
 
+    # addition can only be performed if both matrices are the same size
     if rows_1 == rows_2 & cols_1 == cols_2:
         matrices_sum = []
         for i in range(rows_1):
@@ -74,10 +75,10 @@ def add_matrices(matrix_1, matrix_2):
         print(operation_error)
 
 
-# performs matrix multiplication by a scalar
+# Performs matrix multiplication by a scalar
 def multiply_by_constant(matrix, constant):
-    matrix_product = []
     rows, cols = [x for x in get_matrix_size(matrix)]
+    matrix_product = []
 
     for i in range(rows):
         matrix_product.append([])
@@ -86,11 +87,13 @@ def multiply_by_constant(matrix, constant):
     return matrix_product
 
 
-# performs matrices multiplication
+# Performs matrices multiplication
 def multiply_matrices(matrix_1, matrix_2):
     rows_1, cols_1 = [x for x in get_matrix_size(matrix_1)]
     rows_2, cols_2 = [x for x in get_matrix_size(matrix_2)]
 
+    # matrix multiplication can only be performed if the number of columns
+    # in the first matrix equals the number of rows for the second matrix
     if cols_1 == rows_2:
         matrices_product = []
         for i in range(rows_1):
@@ -105,7 +108,7 @@ def multiply_matrices(matrix_1, matrix_2):
         print(operation_error)
 
 
-# performs user specified matrix transposition
+# Performs user specified matrix transposition
 def transpose_matrix():
     trans_action = int(input('1. Main diagonal\n'
                              '2. Side diagonal\n'
@@ -126,7 +129,7 @@ def transpose_matrix():
         print(input_error)
 
 
-# calculates the determinant of a matrix
+# Calculates the determinant of a matrix
 def calc_determinant(matrix):
     rows, cols = [x for x in get_matrix_size(matrix)]
     det = 0
@@ -144,7 +147,7 @@ def calc_determinant(matrix):
         return det
 
 
-# inverses the matrix
+# Inverses the matrix
 def inverse_matrix(matrix):
     if calc_determinant(matrix) == 0:
         print("This matrix doesn't have an inverse.\n")
@@ -161,12 +164,12 @@ def inverse_matrix(matrix):
             cofactors_matrix, 1 / calc_determinant(matrix))
 
 
-# calculates the cofactor of the given row and column
+# Calculates the cofactor of the given row and column
 def calc_cofactor(matrix, row, col):
     return pow((-1), row + 1 + col + 1) * calc_determinant(get_minor(matrix, row, col))
 
 
-# obtains a submatrix by deleting the corresponding rows and columns
+# Obtains a submatrix by deleting the corresponding rows and columns
 def get_minor(matrix, delete_row, delete_col):
     rows, cols = [x for x in get_matrix_size(matrix)]
     minor_matrix = []
@@ -181,7 +184,7 @@ def get_minor(matrix, delete_row, delete_col):
     return [row for row in minor_matrix if row]
 
 
-# performs transposition along the main diagonal
+# Performs transposition along the main diagonal
 def transpose_main(matrix):
     rows, cols = [x for x in get_matrix_size(matrix)]
     trans_matrix = []
@@ -194,7 +197,7 @@ def transpose_main(matrix):
     return trans_matrix
 
 
-# performs transposition along the side diagonal
+# Performs transposition along the side diagonal
 def transpose_side(matrix):
     rows, cols = [x for x in get_matrix_size(matrix)]
     trans_matrix = []
@@ -207,7 +210,7 @@ def transpose_side(matrix):
     return trans_matrix
 
 
-# performs transposition along the vertical line
+# Performs transposition along the vertical line
 def transpose_vertical(matrix):
     cols = len(matrix[0])
     trans_matrix = []
@@ -217,7 +220,7 @@ def transpose_vertical(matrix):
     return trans_matrix
 
 
-# performs transposition along the horizontal line
+# Performs transposition along the horizontal line
 def transpose_horizontal(matrix):
     cols = len(matrix[0])
     trans_matrix = []
@@ -227,7 +230,7 @@ def transpose_horizontal(matrix):
     return trans_matrix
 
 
-# checks whether the user entered number is int or float
+# Checks whether the user entered number is int or float, and
 # returns the input converted to the corresponding type
 def check_type(number):
     try:
@@ -241,7 +244,7 @@ def check_type(number):
             return None
 
 
-# return matrix size (rows and columns)
+# Returns matrix size (rows and columns)
 def get_matrix_size(matrix):
     return [len(matrix), len(matrix[0])]
 
